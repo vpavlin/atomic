@@ -340,7 +340,12 @@ removes all containers based on an image.
 
 
     def stop(self):
+        inspected_image = False
         self.inspect = self._inspect_container()
+        if self.instpect is None:
+            self.inspect = self._inspect_image()
+            inspected_image = True
+
         args = self._get_args("STOP")
         if args:
             cmd = self.gen_cmd(args)
@@ -353,7 +358,9 @@ removes all containers based on an image.
 
 
         # Container exists
-        if self.inspect["State"]["Running"]:
+        if inspected_image:
+            self.inspect = self._inspect_container()
+        if self.inspect and self.inspect["State"]["Running"]:
             self.d.stop(self.name)
 
     def _rpmostree(self, *args):
